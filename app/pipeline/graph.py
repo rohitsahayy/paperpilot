@@ -8,7 +8,6 @@ from app.agents.writer import write_brief
 
 class ResearchState(TypedDict):
     query: str
-    scope: str
     audience: str
     research_type: str
     page_length: int
@@ -21,7 +20,7 @@ class ResearchState(TypedDict):
 
 # Node: fetches raw content from all 5 sources
 def fetch_node(state: ResearchState) -> ResearchState:
-    raw = fetch_all_sources(state["query"], state["scope"])
+    raw = fetch_all_sources(state["query"])
     return {**state, "raw_content": raw}
 
 
@@ -69,14 +68,12 @@ graph = _builder.compile()
 # Runs the full research pipeline and returns brief and sources
 def run_research_pipeline(
     query: str,
-    scope: str = "Comprehensive",
     audience: str = "Academic Researchers",
     research_type: str = "Comprehensive",
     page_length: int = 1000,
 ) -> dict:
     result = graph.invoke({
         "query": query,
-        "scope": scope,
         "audience": audience,
         "research_type": research_type,
         "page_length": page_length,

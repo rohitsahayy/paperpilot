@@ -7,12 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-# Fetches raw research content from all 5 sources; scope controls result depth
-def fetch_all_sources(query: str, scope: str = "Comprehensive") -> dict:
-    # Focused = fewer results, Comprehensive = default, Exploratory = broader search
-    max_results = {"Focused": 2, "Comprehensive": 3, "Exploratory": 5}.get(scope, 3)
-    search_depth = "advanced" if scope == "Exploratory" else "basic"
-
+# Fetches raw research content from all 5 sources, 3 results each
+def fetch_all_sources(query: str) -> dict:
     results = {
         "arxiv": [],
         "hackernews": [],
@@ -21,19 +17,19 @@ def fetch_all_sources(query: str, scope: str = "Comprehensive") -> dict:
         "devto": [],
     }
 
-    results["arxiv"] = _fetch_arxiv(query, max_results)
-    results["hackernews"] = _fetch_hackernews(query, max_results)
+    results["arxiv"] = _fetch_arxiv(query)
+    results["hackernews"] = _fetch_hackernews(query)
     results["wikipedia"] = _fetch_wikipedia(query)
-    results["tavily"] = _fetch_tavily(query, max_results, search_depth)
-    results["devto"] = _fetch_devto(query, max_results)
+    results["tavily"] = _fetch_tavily(query)
+    results["devto"] = _fetch_devto(query)
 
     return results
 
 
 # Fetches recent papers from ArXiv and parses XML with feedparser
-def _fetch_arxiv(query: str, max_results: int = 3) -> list:
+def _fetch_arxiv(query: str) -> list:
     try:
-        url = f"https://export.arxiv.org/api/query?search_query={query}&max_results={max_results}&sortBy=submittedDate&sortOrder=descending"
+        url = f"https://export.arxiv.org/api/query?search_query={query}&max_results=3&sortBy=submittedDate&sortOrder=descending"
         with httpx.Client(timeout=10) as client:
             response = client.get(url)
         feed = feedparser.parse(response.text)
@@ -51,7 +47,7 @@ def _fetch_arxiv(query: str, max_results: int = 3) -> list:
 
 
 # Fetches top HackerNews stories filtered by query keywords
-def _fetch_hackernews(query: str, max_results: int = 3) -> list:
+def _fetch_hackernews(query: str) -> list:
     try:
         with httpx.Client(timeout=10) as client:
             top_ids_resp = client.get("https://hacker-news.firebaseio.com/v0/topstories.json")
@@ -70,7 +66,7 @@ def _fetch_hackernews(query: str, max_results: int = 3) -> list:
                             "url": item.get("url", ""),
                             "text": item.get("text", ""),
                         })
-                if len(stories) >= max_results:
+                if len(stories) >= 3:
                     break
         return stories
     except Exception as e:
@@ -98,14 +94,14 @@ def _fetch_wikipedia(query: str) -> dict:
 
 
 # Searches Tavily for recent web content about the query
-def _fetch_tavily(query: str, max_results: int = 3, search_depth: str = "basic") -> list:
+def _fetch_tavily(query: str) -> list:
     try:
         api_key = os.getenv("TAVILY_API_KEY")
         if not api_key:
             print("TAVILY_API_KEY not set, skipping Tavily")
             return []
         client = TavilyClient(api_key=api_key)
-        results = client.search(query=query, max_results=max_results, search_depth=search_depth)
+        results = client.search(query=query, max_results=3, search_depth="basic")
         articles = []
         for r in results.get("results", []):
             articles.append({
@@ -120,10 +116,10 @@ def _fetch_tavily(query: str, max_results: int = 3, search_depth: str = "basic")
 
 
 # Fetches DEV.to articles tagged with the query topic
-def _fetch_devto(query: str, max_results: int = 3) -> list:
+def _fetch_devto(query: str) -> list:
     try:
         tag = query.replace(" ", "-").lower()
-        url = f"https://dev.to/api/articles?tag={tag}&per_page={max_results}&top=7"
+        url = f"https://dev.to/api/articles?tag={tag}&per_page=3&top=7"
         with httpx.Client(timeout=10) as client:
             response = client.get(url)
         articles = []

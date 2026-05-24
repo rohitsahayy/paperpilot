@@ -20,7 +20,6 @@ with st.sidebar:
     st.title("🔬 Research Controls")
     st.divider()
 
-    scope = st.selectbox("Research Scope", ["Comprehensive", "Focused", "Exploratory"])
     audience = st.selectbox(
         "Target Audience",
         ["Academic Researchers", "General Public", "Industry Professionals", "Students"],
@@ -34,7 +33,6 @@ with st.sidebar:
     st.divider()
     st.caption("Advanced Options")
     enable_citations = st.checkbox("Enable Citations", value=True)
-    st.checkbox("Enable Plagiarism Check", value=False)
 
 # ── Header ────────────────────────────────────────────────────────────────────
 st.title("🚀 Agentic Research Assistant")
@@ -67,7 +65,6 @@ if run_btn:
                     f"{FASTAPI_URL}/api/v1/research",
                     json={
                         "query": topic,
-                        "scope": scope,
                         "audience": audience,
                         "research_type": research_type,
                         "page_length": page_length,
