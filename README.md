@@ -8,10 +8,7 @@ PaperPilot is a multi-agent AI research assistant that takes a research topic, f
 User (Streamlit UI)
         │
         ▼
-FastAPI Backend (POST /api/v1/research)
-        │
-        ▼
-LangGraph Pipeline
+LangGraph Pipeline (called directly)
   ┌─────────────────────────────────────────┐
   │                                         │
   │  [1] Fetcher Agent                      │
@@ -38,7 +35,7 @@ Streamlit renders markdown brief + source links
 ## How to Run Locally
 
 ### Prerequisites
-- Docker installed
+- Python 3.11+
 - Groq API key (free at [console.groq.com](https://console.groq.com))
 - Tavily API key (free at [tavily.com](https://tavily.com))
 
@@ -56,23 +53,22 @@ Streamlit renders markdown brief + source links
    # Edit .env and add your API keys
    ```
 
-3. Build the Docker image:
+3. Install dependencies:
    ```bash
-   docker build -t paperpilot .
+   pip install -r requirements.txt
    ```
 
-4. Run the container:
+4. Run the app:
    ```bash
-   docker run -p 8000:8000 --env-file .env paperpilot
-   ```
-
-5. Visit [http://localhost:8000/docs](http://localhost:8000/docs) to explore the API.
-
-6. Run the Streamlit frontend (in a separate terminal):
-   ```bash
-   pip install streamlit requests
    streamlit run frontend/streamlit_app.py
    ```
+
+### Docker (optional — for local containerised use)
+
+```bash
+docker build -t paperpilot .
+docker run -p 8000:8000 --env-file .env paperpilot
+```
 
 ## Environment Variables
 
@@ -80,7 +76,6 @@ Streamlit renders markdown brief + source links
 |----------|-------------|
 | `GROQ_API_KEY` | Groq API key for LLM calls |
 | `TAVILY_API_KEY` | Tavily API key for web search |
-| `FASTAPI_URL` | FastAPI backend URL (default: `http://localhost:8000`) |
 
 ## Live Demo
 
@@ -90,8 +85,7 @@ Streamlit renders markdown brief + source links
 
 - **LangGraph** — multi-agent pipeline orchestration
 - **Groq** (llama-3.3-70b-versatile) — fast, free-tier LLM
-- **FastAPI** — REST API backend
-- **Streamlit** — frontend UI
+- **Streamlit** — frontend UI (pipeline called directly, no separate backend)
 - **Docker** — single-container deployment
 - **httpx** — async HTTP client
 - **feedparser** — ArXiv XML parser

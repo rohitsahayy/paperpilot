@@ -1,8 +1,11 @@
 import os
-import requests
+import sys
 import streamlit as st
 
-FASTAPI_URL = os.getenv("FASTAPI_URL", "http://localhost:8000")
+# Allow importing app package from the repo root
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from app.pipeline.graph import run_research_pipeline
 
 st.set_page_config(
     page_title="PaperPilot",
@@ -61,18 +64,12 @@ if run_btn:
     else:
         with st.spinner("Researching across ArXiv, HackerNews, Wikipedia, Tavily and DEV.to..."):
             try:
-                response = requests.post(
-                    f"{FASTAPI_URL}/api/v1/research",
-                    json={
-                        "query": topic,
-                        "audience": audience,
-                        "research_type": research_type,
-                        "page_length": page_length,
-                    },
-                    timeout=180,
+                st.session_state.result = run_research_pipeline(
+                    query=topic,
+                    audience=audience,
+                    research_type=research_type,
+                    page_length=page_length,
                 )
-                response.raise_for_status()
-                st.session_state.result = response.json()
             except Exception as e:
                 st.error(f"Research failed: {e}")
                 st.session_state.result = None
