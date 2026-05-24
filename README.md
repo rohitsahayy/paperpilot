@@ -84,7 +84,7 @@ Streamlit renders markdown brief + source links
 
 ## Live Demo
 
-[Live Demo](https://huggingface.co/spaces/rohitsahayy/paperpilot)
+[Live Demo](https://paperpilotresearcher.streamlit.app)
 
 ## Tech Stack
 
