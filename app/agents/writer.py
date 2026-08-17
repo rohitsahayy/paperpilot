@@ -60,7 +60,7 @@ def write_brief(
     page_length: int = 1000,
 ) -> str:
     llm = ChatGroq(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         api_key=os.getenv("GROQ_API_KEY"),
     )
 
