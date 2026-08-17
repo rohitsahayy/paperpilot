@@ -14,7 +14,7 @@ SYSTEM_PROMPT = (
 # Summarises each non-empty source using Groq LLM, returns list of summary dicts
 def summarise_sources(raw_content: dict) -> list:
     llm = ChatGroq(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         api_key=os.getenv("GROQ_API_KEY"),
     )
 
